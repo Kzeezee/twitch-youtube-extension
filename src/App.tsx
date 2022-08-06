@@ -1,8 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import logo from "./logo.svg";
+import { getCurrentTabUId } from "./chrome/utils";
+import { ChromeMessage, Sender } from "./types";
+import "./App.css";
 
 function App() {
+  const [url, setUrl] = useState<string | undefined>("");
+  const [responseFromContent, setResponseFromContent] = useState<string>("");
+
+  useEffect(() => {
+    const queryInfo = { active: true, lastFocusedWindow: true };
+
+    chrome.tabs &&
+      chrome.tabs.query(queryInfo, (tabs) => {
+        const url = tabs[0].url;
+        setUrl(url);
+      });
+  }, []);
+
+  const sendTestMessage = () => {
+    console.log("Hello from react");
+    // const message: ChromeMessage = {
+    //   from: Sender.React,
+    //   message: "Hello from React",
+    // };
+
+    // getCurrentTabUId((id) => {
+    //   id &&
+    //     chrome.tabs.sendMessage(id, message, (responseFromContentScript) => {
+    //       setResponseFromContent(responseFromContentScript);
+    //     });
+    // });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -10,14 +40,11 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>URL:</p>
+        <p>{url}</p>
+        <button onClick={sendTestMessage}>SEND MESSAGE</button>
+        <p>Response from content:</p>
+        <p>{responseFromContent}</p>
       </header>
     </div>
   );
